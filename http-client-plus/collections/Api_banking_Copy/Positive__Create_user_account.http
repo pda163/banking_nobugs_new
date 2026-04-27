@@ -1,0 +1,6 @@
+### Positive: Create user account
+POST {{baseUrl}}/api/v1/accounts
+Accept: */*
+Authorization: {{authToken2}}
+
+

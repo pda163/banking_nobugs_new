@@ -1,0 +1,12 @@
+### Negative: Admin creates user with empty username
+POST {{baseUrl}}/api/v1/admin/users
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken}}
+
+{
+  "password": "{{userPassword}}",
+  "username": "",
+  "role": "USER"
+}
+

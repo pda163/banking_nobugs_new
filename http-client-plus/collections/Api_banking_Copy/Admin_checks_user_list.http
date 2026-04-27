@@ -1,0 +1,6 @@
+### Admin checks user list
+GET {{baseUrl}}/api/v1/admin/users
+Accept: */*
+Authorization: {{authToken}}
+
+

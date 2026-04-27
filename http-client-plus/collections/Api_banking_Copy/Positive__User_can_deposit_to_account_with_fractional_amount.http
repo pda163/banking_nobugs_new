@@ -1,0 +1,11 @@
+### Positive: User can deposit to account with fractional amount
+POST {{baseUrl}}/api/v1/accounts/deposit
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "id": 2,
+  "balance": 400.40
+}
+

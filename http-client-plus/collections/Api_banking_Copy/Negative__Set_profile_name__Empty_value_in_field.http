@@ -1,0 +1,10 @@
+### Negative: Set profile name. Empty value in field
+PUT {{baseUrl}}/api/v1/customer/profile
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "name": ""
+}
+

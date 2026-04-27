@@ -1,0 +1,12 @@
+### Negative: Admin creates user with username length 16
+POST {{baseUrl}}/api/v1/admin/users
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken}}
+
+{
+  "username": "{{longUsername}}",
+  "password": "{{randomPassword}}",
+  "role": "USER"
+}
+

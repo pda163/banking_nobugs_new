@@ -1,0 +1,12 @@
+### Negative: Admin creates duplicate user
+POST {{baseUrl}}/api/v1/admin/users
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken}}
+
+{
+  "password": "{{userPassword}}",
+  "username": "{{username}}",
+  "role": "USER"
+}
+

@@ -1,0 +1,12 @@
+### Positive: Admin creates a valid user
+POST {{baseUrl}}/api/v1/admin/users
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken}}
+
+{
+  "username": "{{randomUsername}}",
+  "password": "{{randomPassword}}",
+  "role": "USER"
+}
+

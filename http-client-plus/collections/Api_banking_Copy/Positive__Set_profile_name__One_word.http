@@ -1,0 +1,10 @@
+### Positive: Set profile name. One word
+PUT {{baseUrl}}/api/v1/customer/profile
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "name": "Name"
+}
+

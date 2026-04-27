@@ -1,0 +1,11 @@
+### Admin authorization
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken}}
+
+{
+  "password": "admin",
+  "username": "admin"
+}
+
