@@ -1,4 +1,4 @@
-### Positive: User can deposit to account max amount 5000 Copy
+### Positive: User can deposit to account amount 4999,99
 POST {{baseUrl}}/api/v1/accounts/deposit
 Content-Type: application/json
 Accept: */*
@@ -6,6 +6,6 @@ Authorization: {{authToken2}}
 
 {
   "id": 1,
-  "balance": 5000
+  "balance": 4999.99
 }
 

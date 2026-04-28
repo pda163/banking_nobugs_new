@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "b6b4a166-87c2-478c-ab0d-adf6358e0c39",
-    "name": "Api banking Copy",
+    "name": "Api banking_new",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "21067972",
     "_collection_link": "https://go.postman.co/collection/21067972-b6b4a166-87c2-478c-ab0d-adf6358e0c39?source=collection_link"
@@ -1088,7 +1088,7 @@
           "response": []
         },
         {
-          "name": "Positive: User can deposit to account max amount 5000 Copy",
+          "name": "Positive: User can deposit to account max amount 5000",
           "request": {
             "auth": {
               "type": "noauth"
@@ -1136,7 +1136,7 @@
           "response": []
         },
         {
-          "name": "Positive: User can deposit to account with fractional amount",
+          "name": "Positive: User can deposit to account with fractional min amount 0.01",
           "request": {
             "auth": {
               "type": "noauth"
@@ -1159,7 +1159,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 2,\n  \"balance\": 400.40\n}",
+              "raw": "{\n  \"id\": 2,\n  \"balance\": 0.01\n}",
               "options": {
                 "raw": {
                   "headerFamily": "json",
@@ -1184,7 +1184,7 @@
           "response": []
         },
         {
-          "name": "Negative: User deposits to account amount 5001",
+          "name": "Negative: User deposits to account amount 5000.01",
           "request": {
             "auth": {
               "type": "noauth"
@@ -1207,7 +1207,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 2,\n  \"balance\": 5001\n}",
+              "raw": "{\n  \"id\": 2,\n  \"balance\": 5000.01\n}",
               "options": {
                 "raw": {
                   "headerFamily": "json",
@@ -1462,7 +1462,7 @@
           "response": []
         },
         {
-          "name": "Positive: Transfer min amount 0.1",
+          "name": "Positive: Transfer amount 9999.99",
           "request": {
             "auth": {
               "type": "noauth"
@@ -1485,7 +1485,55 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"senderAccountId\": 1,\n  \"receiverAccountId\": 2,\n  \"amount\": 0.1\n}",
+              "raw": "{\n  \"senderAccountId\": 1,\n  \"receiverAccountId\": 2,\n  \"amount\": 9999.99\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/accounts/transfer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts",
+                "transfer"
+              ]
+            },
+            "description": "Transfers money from one account to another."
+          },
+          "response": []
+        },
+        {
+          "name": "Positive: Transfer min amount 0.01",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{authToken2}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"senderAccountId\": 1,\n  \"receiverAccountId\": 2,\n  \"amount\": 0.01\n}",
               "options": {
                 "raw": {
                   "headerFamily": "json",
@@ -1556,7 +1604,7 @@
           "response": []
         },
         {
-          "name": "Negative: Transfer amount exceeds max 10001",
+          "name": "Negative: Transfer amount exceeds max 10000.01",
           "request": {
             "auth": {
               "type": "noauth"
@@ -1579,7 +1627,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"senderAccountId\": 1,\n  \"receiverAccountId\": 2,\n  \"amount\": 10001\n}",
+              "raw": "{\n  \"senderAccountId\": 1,\n  \"receiverAccountId\": 2,\n  \"amount\": 10000.01\n}",
               "options": {
                 "raw": {
                   "headerFamily": "json",

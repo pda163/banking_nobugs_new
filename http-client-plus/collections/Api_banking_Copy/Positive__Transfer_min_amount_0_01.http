@@ -1,4 +1,4 @@
-### Positive: Transfer min amount 0.1
+### Positive: Transfer min amount 0.01
 POST {{baseUrl}}/api/v1/accounts/transfer
 Content-Type: application/json
 Accept: */*
@@ -7,6 +7,6 @@ Authorization: {{authToken2}}
 {
   "senderAccountId": 1,
   "receiverAccountId": 2,
-  "amount": 0.1
+  "amount": 0.01
 }
 
