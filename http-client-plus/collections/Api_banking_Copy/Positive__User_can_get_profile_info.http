@@ -1,0 +1,6 @@
+### Positive: User can get profile info
+GET {{baseUrl}}/api/v1/customer/profile
+Accept: */*
+Authorization: {{authToken2}}
+
+

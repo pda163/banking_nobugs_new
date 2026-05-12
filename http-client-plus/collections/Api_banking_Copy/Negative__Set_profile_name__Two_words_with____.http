@@ -1,0 +1,10 @@
+### Negative: Set profile name. Two words with "_"
+PUT {{baseUrl}}/api/v1/customer/profile
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "name": "name_name"
+}
+

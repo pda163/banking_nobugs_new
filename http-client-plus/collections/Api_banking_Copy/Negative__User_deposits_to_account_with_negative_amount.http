@@ -1,0 +1,11 @@
+### Negative: User deposits to account with negative amount
+POST {{baseUrl}}/api/v1/accounts/deposit
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "id": 2,
+  "balance": -6000
+}
+

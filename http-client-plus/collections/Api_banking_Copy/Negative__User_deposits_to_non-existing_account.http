@@ -1,0 +1,11 @@
+### Negative: User deposits to non-existing account
+POST {{baseUrl}}/api/v1/accounts/deposit
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "id": 1000,
+  "balance": 500
+}
+

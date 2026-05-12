@@ -1,0 +1,12 @@
+### Negative: Transfer amount exceeds max 10000.01
+POST {{baseUrl}}/api/v1/accounts/transfer
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 10000.01
+}
+

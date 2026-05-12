@@ -1,0 +1,6 @@
+### Positive: Verify created account
+GET {{baseUrl}}/api/v1/customer/accounts
+Accept: */*
+Authorization: {{authToken2}}
+
+

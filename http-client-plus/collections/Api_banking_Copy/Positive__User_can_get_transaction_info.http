@@ -1,0 +1,6 @@
+### Positive: User can get transaction info
+GET {{baseUrl}}/api/v1/accounts/:accountId/transactions
+Accept: */*
+Authorization: {{authToken2}}
+
+

@@ -1,0 +1,10 @@
+### Positive: Set profile name. Two words with space
+PUT {{baseUrl}}/api/v1/customer/profile
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "name": "New Name"
+}
+

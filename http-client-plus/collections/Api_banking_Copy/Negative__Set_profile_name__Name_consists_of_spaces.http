@@ -1,0 +1,10 @@
+### Negative: Set profile name. Name consists of spaces
+PUT {{baseUrl}}/api/v1/customer/profile
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "name": "     "
+}
+

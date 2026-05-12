@@ -1,0 +1,12 @@
+### Negative: Transfer amount to non-existing account
+POST {{baseUrl}}/api/v1/accounts/transfer
+Content-Type: application/json
+Accept: */*
+Authorization: {{authToken2}}
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 52,
+  "amount": 100
+}
+
