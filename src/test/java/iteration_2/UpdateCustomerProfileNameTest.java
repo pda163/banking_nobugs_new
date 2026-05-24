@@ -18,6 +18,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 public class UpdateCustomerProfileNameTest {
+
     @BeforeAll
     public static void setupRestAssured() {
         RestAssured.filters(
@@ -72,6 +73,18 @@ public class UpdateCustomerProfileNameTest {
                 .extract()
                 .header("Authorization");
 
+        // Проверка имени профиля до изменения
+        given()
+                .header("Authorization", userAuthHeader)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .get("http://localhost:4111/api/v1/customer/profile")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("username", Matchers.equalTo(username))
+                .body("name", Matchers.nullValue());
+
         // Изменение имени профиля
         given()
                 .contentType(ContentType.JSON)
@@ -87,9 +100,10 @@ public class UpdateCustomerProfileNameTest {
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK)
                 .body("message", Matchers.equalTo("Profile updated successfully"))
+                .body("customer.username", Matchers.equalTo(username))
                 .body("customer.name", Matchers.equalTo(newName));
 
-        // Проверка, что имя сохранилось в профиле
+        // Проверка имени профиля после изменения
         given()
                 .header("Authorization", userAuthHeader)
                 .contentType(ContentType.JSON)
@@ -98,9 +112,9 @@ public class UpdateCustomerProfileNameTest {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK)
+                .body("username", Matchers.equalTo(username))
                 .body("name", Matchers.equalTo(newName));
     }
-
 
     // Изменение имени профиля невалидными данными
     @ParameterizedTest
@@ -149,7 +163,19 @@ public class UpdateCustomerProfileNameTest {
                 .extract()
                 .header("Authorization");
 
-        // Изменение имени профиля
+        // Проверка имени профиля до изменения
+        given()
+                .header("Authorization", userAuthHeader)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .get("http://localhost:4111/api/v1/customer/profile")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("username", Matchers.equalTo(username))
+                .body("name", Matchers.nullValue());
+
+        // Изменение имени профиля невалидными данными
         given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
@@ -164,5 +190,17 @@ public class UpdateCustomerProfileNameTest {
                 .assertThat()
                 .statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body(equalTo("Name must contain two words with letters only"));
+
+        // Проверка что имя профиля не изменилось после невалидного запроса
+        given()
+                .header("Authorization", userAuthHeader)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .get("http://localhost:4111/api/v1/customer/profile")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("username", Matchers.equalTo(username))
+                .body("name", Matchers.nullValue());
     }
 }

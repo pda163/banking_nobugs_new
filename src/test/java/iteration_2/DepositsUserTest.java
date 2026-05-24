@@ -14,9 +14,10 @@ import testDataGenerator.TestDataGenerator;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.*;
 
 public class DepositsUserTest {
+
     @BeforeAll
     public static void setupRestAssured() {
         RestAssured.filters(
@@ -30,6 +31,7 @@ public class DepositsUserTest {
     public void userCanDepositMoneyIntoTheAccountValidTest(double balance) {
         String username = TestDataGenerator.generateUsername();
         String password = TestDataGenerator.generatePassword();
+
         // Создание пользователя
         given()
                 .contentType(ContentType.JSON)
@@ -46,7 +48,6 @@ public class DepositsUserTest {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_CREATED);
-
 
         // Получаем токен пользователя
         String userAuthHeader = given()
@@ -65,7 +66,7 @@ public class DepositsUserTest {
                 .extract()
                 .header("Authorization");
 
-        // Создание аккаунт
+        // Создание аккаунта
         Integer createdAccountId = given()
                 .header("Authorization", userAuthHeader)
                 .contentType(ContentType.JSON)
@@ -77,8 +78,31 @@ public class DepositsUserTest {
                 .extract()
                 .path("id");
 
+        // Проверка что аккаунт создался у пользователя
+        given()
+                .header("Authorization", userAuthHeader)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .get("http://localhost:4111/api/v1/customer/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", hasItem(createdAccountId))
+                .body("find { it.id == %s }.balance".formatted(createdAccountId), equalTo(0.0F));
+
+        // Проверка, что до пополнения транзакций нет
+        given()
+                .header("Authorization", userAuthHeader)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .get("http://localhost:4111/api/v1/accounts/%s/transactions".formatted(createdAccountId))
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("size()", equalTo(0));
+
         // Пополнение аккаунта
-        Integer amountAccount = given()
+        given()
                 .header("Authorization", userAuthHeader)
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
@@ -91,21 +115,20 @@ public class DepositsUserTest {
                 .post("http://localhost:4111/api/v1/accounts/deposit")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .path("amount");
+                .statusCode(HttpStatus.SC_OK);
 
-        // Проверка пополнения аккаунта
+        // Проверка успешной транзакции пополнения
         given()
                 .header("Authorization", userAuthHeader)
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .get("http://localhost:4111/api/v1/customer/accounts")
+                .get("http://localhost:4111/api/v1/accounts/%s/transactions".formatted(createdAccountId))
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK)
-                .body("id", hasItem(createdAccountId))
-                .body("amount", hasItem(amountAccount));
+                .body("size()", equalTo(1))
+                .body("[0].type", equalTo("DEPOSIT"))
+                .body("[0].amount", equalTo((float) balance));
     }
 
     // Пополнение счета. Отрицательные тесты
@@ -114,6 +137,7 @@ public class DepositsUserTest {
     public void userIsUnableToDepositMoneyIntoTheAccountInValidTest(double balance) {
         String username = TestDataGenerator.generateUsername();
         String password = TestDataGenerator.generatePassword();
+
         // Создание пользователя
         given()
                 .contentType(ContentType.JSON)
@@ -131,7 +155,6 @@ public class DepositsUserTest {
                 .assertThat()
                 .statusCode(HttpStatus.SC_CREATED);
 
-
         // Получаем токен пользователя
         String userAuthHeader = given()
                 .contentType(ContentType.JSON)
@@ -139,8 +162,7 @@ public class DepositsUserTest {
                 .body("""
                         {
                           "password": "%s",
-                          "username": "%s",
-                          "role": "USER"
+                          "username": "%s"
                         }
                         """.formatted(password, username))
                 .post("http://localhost:4111/api/v1/auth/login")
@@ -150,7 +172,7 @@ public class DepositsUserTest {
                 .extract()
                 .header("Authorization");
 
-        // Создание аккаунт
+        // Создание аккаунта
         Integer createdAccountId = given()
                 .header("Authorization", userAuthHeader)
                 .contentType(ContentType.JSON)
@@ -162,7 +184,19 @@ public class DepositsUserTest {
                 .extract()
                 .path("id");
 
-        // Пополнение аккаунта
+        // Проверка что аккаунт создался у пользователя
+        given()
+                .header("Authorization", userAuthHeader)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .get("http://localhost:4111/api/v1/customer/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", hasItem(createdAccountId))
+                .body("find { it.id == %s }.balance".formatted(createdAccountId), equalTo(0.0F));
+
+        // Пополнение аккаунта невалидной суммой
         given()
                 .header("Authorization", userAuthHeader)
                 .contentType(ContentType.JSON)
@@ -177,13 +211,25 @@ public class DepositsUserTest {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_BAD_REQUEST);
+
+        // Проверка что транзакция пополнения не создалась
+        given()
+                .header("Authorization", userAuthHeader)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .get("http://localhost:4111/api/v1/accounts/%s/transactions".formatted(createdAccountId))
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("size()", equalTo(0));
     }
 
     // Пополнение несуществующего счета. Отрицательный тест.
     @Test
-    public void userDepositsToNonExistingAccountInValidTes() {
+    public void userDepositsToNonExistingAccountInValidTest() {
         String username = TestDataGenerator.generateUsername();
         String password = TestDataGenerator.generatePassword();
+
         // Создание пользователя
         given()
                 .contentType(ContentType.JSON)
@@ -201,7 +247,6 @@ public class DepositsUserTest {
                 .assertThat()
                 .statusCode(HttpStatus.SC_CREATED);
 
-
         // Получаем токен пользователя
         String userAuthHeader = given()
                 .contentType(ContentType.JSON)
@@ -209,8 +254,7 @@ public class DepositsUserTest {
                 .body("""
                         {
                           "password": "%s",
-                          "username": "%s",
-                          "role": "USER"
+                          "username": "%s"
                         }
                         """.formatted(password, username))
                 .post("http://localhost:4111/api/v1/auth/login")
@@ -220,7 +264,7 @@ public class DepositsUserTest {
                 .extract()
                 .header("Authorization");
 
-        // Создание аккаунт
+        // Создание аккаунта
         Integer createdAccountId = given()
                 .header("Authorization", userAuthHeader)
                 .contentType(ContentType.JSON)
@@ -232,14 +276,26 @@ public class DepositsUserTest {
                 .extract()
                 .path("id");
 
-        // Пополнение аккаунта
+        // Проверка что реальный аккаунт создался у пользователя
+        given()
+                .header("Authorization", userAuthHeader)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .get("http://localhost:4111/api/v1/customer/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", hasItem(createdAccountId))
+                .body("find { it.id == %s }.balance".formatted(createdAccountId), equalTo(0.0F));
+
+        // Пополнение несуществующего аккаунта
         given()
                 .header("Authorization", userAuthHeader)
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .body("""
                         {
-                          "id": 9999999999999,
+                          "id": 999999999,
                           "balance": 100
                         }
                         """)
@@ -247,5 +303,16 @@ public class DepositsUserTest {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_FORBIDDEN);
+
+        // Проверка что транзакций на реальном счете нет
+        given()
+                .header("Authorization", userAuthHeader)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .get("http://localhost:4111/api/v1/accounts/%s/transactions".formatted(createdAccountId))
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("size()", equalTo(0));
     }
 }
